@@ -14,7 +14,7 @@ export default function FeedbackForm() {
   const [hovered, setHovered] = useState(0);
   const [submitted, setSubmitted] = useState(false);
 
-  // ✅ Load forms (ensure one default exists) 
+  // ✅ Load forms (ensure one default exists)
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("feedbackForms")) || [];
 
@@ -48,7 +48,7 @@ export default function FeedbackForm() {
         formType: selectedForm?.title || "General Feedback",
       };
 
-      const res = await fetch("https://feedback-backend-eqzx.onrender.com", {
+      const res = await fetch("http://localhost:5000/api/feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

@@ -14,11 +14,15 @@ export default function FeedbackForm() {
   const [hovered, setHovered] = useState(0);
   const [submitted, setSubmitted] = useState(false);
 
-  // ✅ Load forms (ensure one default exists)
+  // 🌍 Backend base URL (auto switches for local vs production)
+  const backendURL =
+    import.meta.env.MODE === "development"
+      ? "http://localhost:5000"
+      : "https://feedback-backend-eqzx.onrender.com";
+
+  // ✅ Load feedback forms from localStorage
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("feedbackForms")) || [];
-
-    // If no forms exist, create a default one
     if (stored.length === 0) {
       const defaultForm = {
         id: Date.now(),
@@ -48,14 +52,16 @@ export default function FeedbackForm() {
         formType: selectedForm?.title || "General Feedback",
       };
 
-      const res = await fetch("http://localhost:5000/api/feedback", {
+      const res = await fetch(`${backendURL}/api/feedback`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
       if (!res.ok) throw new Error("Failed to submit feedback");
+
       setSubmitted(true);
+      setForm({ name: "", email: "", rating: 0, comments: "" });
     } catch (error) {
       console.error("❌ Error submitting feedback:", error);
       alert("Failed to submit feedback. Please try again later.");
@@ -97,7 +103,7 @@ export default function FeedbackForm() {
             </h2>
             <p className="text-gray-500 mb-10 text-center max-w-2xl">
               Select a form below to share your thoughts and help us improve our
-              services. Each form is tailored for a specific purpose.
+              services.
             </p>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl">
@@ -133,7 +139,6 @@ export default function FeedbackForm() {
 
             {!submitted ? (
               <form onSubmit={handleSubmit} className="space-y-5">
-                {/* Name */}
                 <div>
                   <label className="block text-gray-700 mb-1">Name</label>
                   <input
@@ -146,7 +151,6 @@ export default function FeedbackForm() {
                   />
                 </div>
 
-                {/* Email */}
                 <div>
                   <label className="block text-gray-700 mb-1">Email</label>
                   <input
@@ -159,7 +163,6 @@ export default function FeedbackForm() {
                   />
                 </div>
 
-                {/* Rating */}
                 <div>
                   <label className="block text-gray-700 mb-2">Rating</label>
                   <div className="flex justify-center gap-2">
@@ -204,7 +207,6 @@ export default function FeedbackForm() {
                   )}
                 </div>
 
-                {/* Comments */}
                 <div>
                   <label className="block text-gray-700 mb-1">Comments</label>
                   <textarea
@@ -217,7 +219,6 @@ export default function FeedbackForm() {
                   ></textarea>
                 </div>
 
-                {/* Buttons */}
                 <div className="flex justify-between items-center mt-6">
                   <button
                     type="button"
